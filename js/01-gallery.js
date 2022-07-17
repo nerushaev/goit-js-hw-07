@@ -26,24 +26,27 @@ listGallery.insertAdjacentHTML('beforeend', createGallleryMarkup(galleryItems));
 
 listGallery.addEventListener('click', onImgGalleryClick);
 
+const instance = basicLightbox.create(`<img src="">`, {
+    onShow: instance => {
+        window.addEventListener('keydown', onEscapePress);
+    },
+    onClose: instance => {
+        window.removeEventListener('keydown', onEscapePress);
+    },
+});
+
 function onImgGalleryClick(event) {
     event.preventDefault();
-const imgElSelected = event.target.classList.contains('gallery__image');
-
-if (!imgElSelected) {
-    return;
-} 
-const url = event.target.dataset.source;
-
-const instance = basicLightbox.create(`<img src="${url}">`);
-instance.show(() => window.addEventListener('keydown', onKeyPress));
-
-function onKeyPress(event) {
-    if (event.key === 'Escape') {
-        instance.close(() => window.removeEventListener('keydown', onKeyPress));
+    if (event.target.nodeName !== "IMG") {
         return;
     }
-    return;
-};
+    instance.element().querySelector('img').src = event.target.dataset.source;
+    instance.show();
+}
 
+function onEscapePress(event) {
+    if (event.key === 'Escape') {
+        instance.close();
+        return;
+    }
 };
